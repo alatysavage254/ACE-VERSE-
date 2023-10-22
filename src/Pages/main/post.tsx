@@ -1,5 +1,5 @@
 import { addDoc, getDocs, collection, query, where, deleteDoc, doc } from 'firebase/firestore';
-import { Post as IPost } from './main'
+import { IPost as IPost } from './main'
 import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect, useState, useCallback } from 'react';
