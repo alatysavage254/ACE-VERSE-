@@ -26,7 +26,7 @@ const signUserOut = async () =>  {
       {user && (
       <>
      <p> {user?.displayName} </p>
-      <img src={user?.photoURL || ""} width="20" height="20" alt="Image" />
+      <img src={user?.photoURL || ""} width="20" height="20" alt="Random" />
       <button onClick={signUserOut}> Log Out</button>
       </>
       )}

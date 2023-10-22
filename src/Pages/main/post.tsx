@@ -2,7 +2,7 @@ import { addDoc, getDocs, collection, query, where, deleteDoc, doc } from 'fireb
 import { Post as IPost } from './main'
 import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
  
 interface Props {
@@ -27,10 +27,10 @@ export const Post = (props: Props) => {
 
   const likesDoc = query(likesRef, where("postId", "==", post.id));
 
-  const getLikes = async () => {
-   const data =  await getDocs(likesDoc);
-   setLikes(data.docs.map((doc) => ({ userId: doc.data().userId, likeId: doc.id })));
-  };
+  const getLikes = useCallback(async () => {
+    const data = await getDocs(likesDoc);
+    setLikes(data.docs.map((doc) => ({ userId: doc.data().userId, likeId: doc.id })));
+  }, [likesDoc]);
 
   const addLike = async () => {
     try {
