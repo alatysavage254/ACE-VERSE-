@@ -39,5 +39,5 @@ export const Main = () => {
 
 
 
-export { Post };
+// export { Post };
 
