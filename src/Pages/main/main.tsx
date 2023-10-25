@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { db } from '../../config/firebase';
 import { Post } from './post'
 
-export interface IPost {
+export interface HOOD {
   id: string;
   userId: string;
   title: string;
@@ -12,13 +12,13 @@ export interface IPost {
 }
 
 export const Main = () => {
-  const [postsList, setPostsList] = useState<IPost[] | null>(null);
+  const [postsList, setPostsList] = useState<HOOD[] | null>(null);
   const postRef = collection(db, "posts"); 
 
   const getPosts = useCallback(async () => {
     const data = await getDocs(postRef);
     setPostsList(
-      data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as IPost[]
+      data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as HOOD[]
     );
   }, [postRef]);
  
@@ -33,5 +33,6 @@ export const Main = () => {
         ))} 
       </div>
     );
-  }
+
+        };
 

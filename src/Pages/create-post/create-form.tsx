@@ -6,11 +6,11 @@ import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 
+
 interface CreateFormData {
   title: string;
   description: string;
 }
-
 export const CreateForm = () => {
 
 const [user] = useAuthState(auth);
