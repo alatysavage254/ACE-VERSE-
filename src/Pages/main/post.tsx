@@ -79,20 +79,69 @@ export const Post = (props: Props) => {
   }, [getLikes]);
   
 
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!user || user.uid !== post.userId || deleting) return;
+    
+    if (!window.confirm('Are you sure you want to delete this post?')) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      // Delete all likes for this post first
+      const likesToDelete = await getDocs(likesDoc);
+      const deletePromises = likesToDelete.docs.map(doc => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+
+      // Then delete the post
+      const postDoc = doc(db, "posts", post.id);
+      await deleteDoc(postDoc);
+
+      // Refresh the posts list (you'll need to implement this in main.tsx)
+      window.location.reload();
+    } catch (err) {
+      console.error('Failed to delete post:', err);
+      alert('Failed to delete post. Check console for details.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
-  <div>
-     <div className="title">
-      <h1>{post.title}</h1>
+    <div style={{ border: '1px solid #ccc', margin: '1rem 0', padding: '1rem' }}>
+      <div className="title">
+        <h1>{post.title}</h1>
       </div> 
       <div className='body'>
-        <p> {post.description}</p>
+        <p>{post.description}</p>
       </div>
-     <div className="footer">
-      <p> @{post.username}</p>
-
-    <button onClick={hasUserLiked ?   removeLike : addLike }> {hasUserLiked ? <>&#128078;</> : <>&#128077;</>} </button>
-    {likes && <p> Likes: {likes?.length} </p>}
-     </div>
-     </div>
+      <div className="footer">
+        <p>@{post.username}</p>
+        <button onClick={hasUserLiked ? removeLike : addLike}>
+          {hasUserLiked ? <>&#128078;</> : <>&#128077;</>}
+        </button>
+        {likes && <p>Likes: {likes?.length}</p>}
+        
+        {user?.uid === post.userId && (
+          <button 
+            onClick={handleDelete} 
+            disabled={deleting}
+            style={{ 
+              backgroundColor: '#ff4444',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              marginLeft: '1rem',
+              cursor: deleting ? 'not-allowed' : 'pointer',
+              opacity: deleting ? 0.7 : 1
+            }}
+          >
+            {deleting ? 'Deleting...' : 'Delete Post'}
+          </button>
+        )}
+      </div>
+    </div>
   )
 }
