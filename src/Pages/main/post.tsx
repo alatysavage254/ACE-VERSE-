@@ -134,6 +134,21 @@ export const Post = (props: Props) => {
     }}>
       <div style={{ marginBottom: '10px' }}>
         <h3 style={{ margin: '0 0 10px 0' }}>{post.title}</h3>
+        {/** Image thumbnail */}
+        {Boolean((post as any).imageUrl) && (
+          <div style={{ margin: '10px 0' }}>
+            <img
+              src={(post as any).imageUrl as string}
+              alt={post.title}
+              style={{
+                maxWidth: '100%',
+                borderRadius: 8,
+                display: 'block',
+                margin: '0 auto'
+              }}
+            />
+          </div>
+        )}
         <p style={{ margin: '0 0 15px 0' }}>{post.description}</p>
         <p style={{ color: '#666', fontSize: '0.9em', margin: '0' }}>@{post.username}</p>
       </div>
