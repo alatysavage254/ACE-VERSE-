@@ -4,6 +4,7 @@ import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect, useState, useCallback } from 'react';
 import { Loader } from '../../components/Loader';
+import { useToast } from '../../components/Toast';
 
  
 interface Props {
@@ -18,6 +19,7 @@ interface Like{
 export const Post = (props: Props) => {
   const { post } = props;
   const [ user ]  = useAuthState (auth);
+  const { addToast } = useToast();
 
   const [likes,setLikes] = useState<Like[] | null>(null);
   const [currentTitle, setCurrentTitle] = useState(post.title);
@@ -64,6 +66,7 @@ export const Post = (props: Props) => {
       setLikes((prev) =>
         prev ? [...prev, { userId: user.uid, likeId: newDoc.id }] : [{ userId: user.uid, likeId: newDoc.id }]
       );
+      if (user.uid !== post.userId) addToast('Someone liked your post');
     } catch (err) {
       console.log(err);
     }
@@ -163,6 +166,7 @@ export const Post = (props: Props) => {
       });
       setNewComment("");
       await getComments();
+      if (user.uid !== post.userId) addToast('New comment on your post');
     } catch (e) {
       console.error(e);
       alert('Failed to add comment');

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { auth, provider } from '../config/firebase';
+import { auth, db, provider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +12,19 @@ export const Login = () => {
     if (loading) return; // prevent multiple popups
     setLoading(true);
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const u = result.user;
+      if (u?.uid) {
+        const userDoc = doc(db, 'users', u.uid);
+        await setDoc(userDoc, {
+          uid: u.uid,
+          displayName: u.displayName || null,
+          photoURL: u.photoURL || null,
+          email: u.email || null,
+          updatedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+        }, { merge: true });
+      }
       navigate('/');
     } catch (error: any) {
       if (error?.code === 'auth/cancelled-popup-request') {
