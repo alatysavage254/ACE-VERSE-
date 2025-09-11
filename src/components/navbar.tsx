@@ -3,11 +3,11 @@ import { auth } from '../config/firebase';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signOut } from 'firebase/auth';
 import "../App.css"
-export const Navbar = () => {
-const [user] = useAuthState(auth);
+export const Navbar: React.FC = () => {
+  const [user] = useAuthState(auth);
 
-const signUserOut = async () =>  {
-  await signOut(auth);
+  const signUserOut = async () => {
+    await signOut(auth);
 
 }
   return (
