@@ -1,7 +1,8 @@
 import { getDocs, collection } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../../config/firebase';
-import { Post } from './post'
+import { Post } from './post';
+import { Loader } from '../../components/Loader';
 
 export interface HOOD {
   id: string;
@@ -35,7 +36,7 @@ export const Main = () => {
         }}>
           Recent Posts
         </h1>
-        {!postsList && <div style={{ textAlign: 'center' }}>Loading posts...</div>}
+        {!postsList && <Loader />}
         {postsList?.length === 0 && (
           <div style={{ 
             textAlign: 'center', 

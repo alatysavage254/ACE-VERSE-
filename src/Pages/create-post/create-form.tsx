@@ -6,6 +6,7 @@ import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
+import { Loader } from '../../components/Loader';
 
 interface CreateFormData {
   title: string;
@@ -56,7 +57,7 @@ export const CreateForm = () => {
     }
   };
 
-  if (authLoading) return <p>Checking authentication...</p>;
+  if (authLoading) return <Loader />;
 
   return (
     <div className="container" style={{ maxWidth: '600px', padding: '2rem 20px' }}>

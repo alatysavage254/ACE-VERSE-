@@ -3,6 +3,7 @@ import {  HOOD as IPost } from './main';
 import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect, useState, useCallback } from 'react';
+import { Loader } from '../../components/Loader';
 
  
 interface Props {
@@ -88,7 +89,7 @@ export const Post = (props: Props) => {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (deleting) return;
+    if (deleting) return <Loader />;
     
     if (!window.confirm('Are you sure you want to delete this post?')) {
       return;
