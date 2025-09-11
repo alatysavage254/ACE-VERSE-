@@ -1,13 +1,13 @@
 import {useForm} from 'react-hook-form';
 import * as yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
-import { addDoc, collection } from "firebase/firestore";
-import { auth, db } from '../../config/firebase';
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { auth, db, storage } from '../../config/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
-
+import React, { useState } from 'react';
 import { Loader } from '../../components/Loader';
-import { useState } from 'react';
 //import { Loader } from '../../components/Loader';
 
 interface CreateFormData {
@@ -20,6 +20,8 @@ export const CreateForm = () => {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const schema = yup.object().shape({
       title: yup.string().required("You must add a title."),
@@ -45,10 +47,22 @@ export const CreateForm = () => {
 
     setSubmitting(true);
     try {
+      let imageUrl: string | null = null;
+
+      if (file) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
+        const storagePath = `posts/${user.uid}/${Date.now()}_${safeName}`;
+        const storageRef = ref(storage, storagePath);
+        await uploadBytes(storageRef, file);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
       await addDoc(postRef, {
         ...data,
         username: user.displayName || null,
         userId: user.uid,
+        imageUrl,
+        createdAt: serverTimestamp(),
       });
       navigate('/');
     } catch (error: any) {
@@ -117,6 +131,25 @@ export const CreateForm = () => {
           />
           {errors.description?.message && (
             <p className="error-message">{errors.description.message}</p>
+          )}
+        </div>
+
+        <div className="form-group">
+          <input
+            type="file"
+            accept="image/*"
+            className="form-control"
+            disabled={submitting || !user}
+            onChange={(e) => {
+              const selected = e.target.files?.[0] || null;
+              setFile(selected);
+              setPreviewUrl(selected ? URL.createObjectURL(selected) : null);
+            }}
+          />
+          {previewUrl && (
+            <div style={{ marginTop: '0.5rem' }}>
+              <img src={previewUrl} alt="preview" style={{ maxWidth: '100%', borderRadius: 8 }} />
+            </div>
           )}
         </div>
 
