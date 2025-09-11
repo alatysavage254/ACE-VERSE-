@@ -6,7 +6,7 @@ import { auth, db, storage } from '../../config/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Loader } from '../../components/Loader';
 
 interface CreateFormData {
