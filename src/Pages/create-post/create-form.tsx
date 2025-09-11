@@ -59,17 +59,79 @@ export const CreateForm = () => {
   if (authLoading) return <p>Checking authentication...</p>;
 
   return (
-    <form onSubmit={handleSubmit(onCreatePost)}>
-      {!user && (
-        <div style={{color: 'red'}}>You must be signed in to create posts. <button type="button" onClick={() => navigate('/login')}>Sign in</button></div>
-      )}
+    <div className="container" style={{ maxWidth: '600px', padding: '2rem 20px' }}>
+      <h1 style={{ 
+        fontSize: '2rem', 
+        fontWeight: '600', 
+        color: '#1f2937',
+        marginBottom: '2rem',
+        textAlign: 'center'
+      }}>
+        Create a New Post
+      </h1>
 
-      <input placeholder='Title...' {...register("title")} disabled={submitting || !user}/>
-      <p style={{color: "red"}}> {errors.title?.message}</p>
-      <textarea placeholder='Description...' {...register("description")} disabled={submitting || !user}/>
-      <p style={{color: "red"}}> {errors.description?.message}</p>
-      {submitError && <p style={{color: 'red'}}>{submitError}</p>}
-      <input type="submit" value={submitting ? 'Creating...' : 'Create Post'} disabled={submitting || !user} />
-    </form>
+      <form onSubmit={handleSubmit(onCreatePost)} className="card">
+        {!user && (
+          <div style={{
+            backgroundColor: '#fee2e2',
+            padding: '1rem',
+            borderRadius: '8px',
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <span style={{ color: '#dc2626' }}>You must be signed in to create posts.</span>
+            <button 
+              type="button" 
+              onClick={() => navigate('/login')}
+              className="btn btn-primary"
+            >
+              Sign in
+            </button>
+          </div>
+        )}
+
+        <div className="form-group">
+          <input 
+            className="form-control"
+            placeholder="Enter your title..."
+            {...register("title")} 
+            disabled={submitting || !user}
+          />
+          {errors.title?.message && (
+            <p className="error-message">{errors.title.message}</p>
+          )}
+        </div>
+
+        <div className="form-group">
+          <textarea 
+            className="form-control"
+            placeholder="What's on your mind?"
+            rows={6}
+            {...register("description")} 
+            disabled={submitting || !user}
+          />
+          {errors.description?.message && (
+            <p className="error-message">{errors.description.message}</p>
+          )}
+        </div>
+
+        {submitError && (
+          <div className="error-message" style={{ marginBottom: '1rem' }}>
+            {submitError}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="btn btn-primary"
+          style={{ width: '100%' }}
+          disabled={submitting || !user}
+        >
+          {submitting ? 'Creating...' : 'Create Post'}
+        </button>
+      </form>
+    </div>
   )
 }

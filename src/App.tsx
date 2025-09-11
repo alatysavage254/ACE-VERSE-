@@ -1,23 +1,43 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Main } from "./Pages/main/main";
 import { Login } from "./Pages/Login";
 import { Navbar } from "./components/navbar";
 import { CreatePost } from "./Pages/create-post/create-post";
+import './styles/global.css';
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <div className="App">
+        <Navbar />
+        <Main />
+      </div>
+    ),
+  },
+  {
+    path: "/login",
+    element: (
+      <div className="App">
+        <Navbar />
+        <Login />
+      </div>
+    ),
+  },
+  {
+    path: "/createpost",
+    element: (
+      <div className="App">
+        <Navbar />
+        <CreatePost />
+      </div>
+    ),
+  },
+]);
 
 function App() {
-  return (
-    <div className="App">
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/createpost" element={<CreatePost />} />
-        </Routes>
-      </Router>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

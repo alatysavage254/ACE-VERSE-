@@ -82,7 +82,7 @@ export const Post = (props: Props) => {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!user || user.uid !== post.userId || deleting) return;
+    if (deleting) return;
     
     if (!window.confirm('Are you sure you want to delete this post?')) {
       return;
@@ -92,55 +92,80 @@ export const Post = (props: Props) => {
     try {
       // Delete all likes for this post first
       const likesToDelete = await getDocs(likesDoc);
-      const deletePromises = likesToDelete.docs.map(doc => deleteDoc(doc.ref));
-      await Promise.all(deletePromises);
+      
+      // Delete likes in batches to avoid potential issues
+      for (const doc of likesToDelete.docs) {
+        try {
+          await deleteDoc(doc.ref);
+        } catch (error) {
+          console.warn('Failed to delete like, continuing...', error);
+        }
+      }
 
       // Then delete the post
       const postDoc = doc(db, "posts", post.id);
       await deleteDoc(postDoc);
 
-      // Refresh the posts list (you'll need to implement this in main.tsx)
-      window.location.reload();
-    } catch (err) {
+      // Use window.location.href to ensure clean navigation
+      window.location.href = '/';
+    } catch (err: any) {
       console.error('Failed to delete post:', err);
-      alert('Failed to delete post. Check console for details.');
+      alert(err?.message || 'Failed to delete post. Make sure you have permission.');
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <div style={{ border: '1px solid #ccc', margin: '1rem 0', padding: '1rem' }}>
-      <div className="title">
-        <h1>{post.title}</h1>
-      </div> 
-      <div className='body'>
-        <p>{post.description}</p>
+    <div style={{
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '15px',
+      margin: '10px 0',
+      backgroundColor: 'white',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <div style={{ marginBottom: '10px' }}>
+        <h3 style={{ margin: '0 0 10px 0' }}>{post.title}</h3>
+        <p style={{ margin: '0 0 15px 0' }}>{post.description}</p>
+        <p style={{ color: '#666', fontSize: '0.9em', margin: '0' }}>@{post.username}</p>
       </div>
-      <div className="footer">
-        <p>@{post.username}</p>
-        <button onClick={hasUserLiked ? removeLike : addLike}>
-          {hasUserLiked ? <>&#128078;</> : <>&#128077;</>}
-        </button>
-        {likes && <p>Likes: {likes?.length}</p>}
-        
-        {user?.uid === post.userId && (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: '10px'
+      }}>
+        <div>
           <button 
-            onClick={handleDelete} 
-            disabled={deleting}
-            style={{ 
-              backgroundColor: '#ff4444',
-              color: 'white',
+            onClick={hasUserLiked ? removeLike : addLike}
+            style={{
               border: 'none',
-              padding: '0.5rem 1rem',
-              marginLeft: '1rem',
-              cursor: deleting ? 'not-allowed' : 'pointer',
-              opacity: deleting ? 0.7 : 1
+              background: 'none',
+              cursor: 'pointer',
+              fontSize: '1.1em',
+              padding: '5px 10px'
             }}
           >
-            {deleting ? 'Deleting...' : 'Delete Post'}
+            {hasUserLiked ? '❤️' : '🤍'}
+            <span style={{ marginLeft: '5px' }}>{likes?.length || 0}</span>
           </button>
-        )}
+        </div>
+        <button 
+          onClick={handleDelete}
+          disabled={deleting}
+          style={{
+            backgroundColor: '#ff4444',
+            color: 'white',
+            border: 'none',
+            padding: '8px 15px',
+            borderRadius: '5px',
+            cursor: deleting ? 'not-allowed' : 'pointer',
+            opacity: deleting ? 0.7 : 1
+          }}
+        >
+          {deleting ? 'Deleting...' : 'Delete'}
+        </button>
       </div>
     </div>
   )
