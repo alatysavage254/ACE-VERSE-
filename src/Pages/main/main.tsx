@@ -1,5 +1,5 @@
 import { getDocs, collection } from 'firebase/firestore';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '../../config/firebase';
 import { Post } from './post'
 
@@ -13,23 +13,21 @@ export interface HOOD {
 
 export const Main = () => {
   const [postsList, setPostsList] = useState<HOOD[] | null>(null);
-  const postRef = collection(db, "posts"); 
-
-  const getPosts = useCallback(async () => {
-    const data = await getDocs(postRef);
-    setPostsList(
-      data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as HOOD[]
-    );
-  }, [postRef]);
  
     useEffect (() => {
-      getPosts();
-    }, [getPosts]);
+      const fetchPosts = async () => {
+        const data = await getDocs(collection(db, "posts"));
+        setPostsList(
+          data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as HOOD[]
+        );
+      };
+      fetchPosts();
+    }, []);
 
     return (
       <div> 
         {postsList?.map((post) => (
-          <Post post={post} />
+          <Post key={post.id} post={post} />
         ))} 
       </div>
     );
