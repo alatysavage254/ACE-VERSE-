@@ -2,7 +2,7 @@ import { addDoc, getDocs, collection, query, where, deleteDoc, doc, orderBy, ser
 import {  HOOD as IPost } from './main';
 import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { Loader } from '../../components/Loader';
 import { useToast } from '../../components/Toast';
 
@@ -16,7 +16,7 @@ interface Like{
   userId: string;
 }
 
-export const Post = (props: Props) => {
+export const Post = memo((props: Props) => {
   const { post } = props;
   const [ user ]  = useAuthState (auth);
   const { addToast } = useToast();
@@ -48,6 +48,7 @@ export const Post = (props: Props) => {
   };
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [newComment, setNewComment] = useState("");
+  const [commentsOpen, setCommentsOpen] = useState(false);
 
   const getComments = useCallback(async () => {
     const data = await getDocs(commentsQuery);
@@ -107,8 +108,7 @@ export const Post = (props: Props) => {
   
   useEffect(() => {
     getLikes();
-    getComments();
-  }, [getLikes, getComments]);
+  }, [getLikes]);
   
 
   const [deleting, setDeleting] = useState(false);
@@ -222,21 +222,6 @@ export const Post = (props: Props) => {
           />
         ) : (
           <h3 style={{ margin: '0 0 10px 0' }}>{currentTitle}</h3>
-        )}
-        {/** Image thumbnail */}
-        {Boolean((post as any).imageUrl) && (
-          <div style={{ margin: '10px 0' }}>
-            <img
-              src={(post as any).imageUrl as string}
-              alt={post.title}
-              style={{
-                maxWidth: '100%',
-                borderRadius: 8,
-                display: 'block',
-                margin: '0 auto'
-              }}
-            />
-          </div>
         )}
         {/** Image thumbnail */}
         {Boolean((post as any).imageUrl) && (
@@ -363,44 +348,70 @@ export const Post = (props: Props) => {
         </div>
       </div>
       <div style={{ marginTop: 16, borderTop: '1px solid #eee', paddingTop: 12 }}>
-        <h4 style={{ textAlign: 'left', margin: '0 0 10px 0' }}>Comments</h4>
-        {!comments && <Loader />}
-        {comments?.length === 0 && (
-          <p style={{ color: '#6b7280', textAlign: 'left' }}>No comments yet.</p>
-        )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {comments?.map((c) => (
-            <div key={c.id} style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: 12, color: '#6b7280' }}>@{c.username || 'anon'}</div>
-              <div>{c.text}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-          <input
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder={user ? 'Write a comment…' : 'Sign in to comment'}
-            disabled={!user}
-            style={{ flex: 1, padding: 8, border: '1px solid #e5e7eb', borderRadius: 6 }}
-          />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h4 style={{ textAlign: 'left', margin: '0 0 10px 0' }}>Comments</h4>
           <button
-            onClick={handleAddComment}
-            disabled={!user || !newComment.trim()}
+            onClick={async () => {
+              const next = !commentsOpen;
+              setCommentsOpen(next);
+              if (next && comments == null) {
+                await getComments();
+              }
+            }}
             style={{
               backgroundColor: '#3b82f6',
               color: 'white',
               border: 'none',
-              padding: '8px 15px',
-              borderRadius: '6px',
-              cursor: (!user || !newComment.trim()) ? 'not-allowed' : 'pointer',
-              opacity: (!user || !newComment.trim()) ? 0.7 : 1,
+              padding: '6px 10px',
+              borderRadius: 6,
+              cursor: 'pointer',
             }}
           >
-            Comment
+            {commentsOpen ? 'Hide' : 'Show'}
           </button>
         </div>
+        {!commentsOpen && <p style={{ color: '#6b7280', textAlign: 'left' }}>Hidden</p>}
+        {commentsOpen && !comments && <Loader />}
+        {commentsOpen && comments?.length === 0 && (
+          <p style={{ color: '#6b7280', textAlign: 'left' }}>No comments yet.</p>
+        )}
+        {commentsOpen && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {comments?.map((c) => (
+              <div key={c.id} style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>@{c.username || 'anon'}</div>
+                <div>{c.text}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        {commentsOpen && (
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <input
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder={user ? 'Write a comment…' : 'Sign in to comment'}
+              disabled={!user}
+              style={{ flex: 1, padding: 8, border: '1px solid #e5e7eb', borderRadius: 6 }}
+            />
+            <button
+              onClick={handleAddComment}
+              disabled={!user || !newComment.trim()}
+              style={{
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                padding: '8px 15px',
+                borderRadius: '6px',
+                cursor: (!user || !newComment.trim()) ? 'not-allowed' : 'pointer',
+                opacity: (!user || !newComment.trim()) ? 0.7 : 1,
+              }}
+            >
+              Comment
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
-}
+})

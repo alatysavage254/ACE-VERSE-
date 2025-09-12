@@ -22,6 +22,13 @@ export const CreateForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  // Cleanup preview object URLs to avoid memory leaks
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   const schema = yup.object().shape({
       title: yup.string().required("You must add a title."),
       description: yup.string().required("you must add a description"),
@@ -142,6 +149,7 @@ export const CreateForm = () => {
             onChange={(e) => {
               const selected = e.target.files?.[0] || null;
               setFile(selected);
+              if (previewUrl) URL.revokeObjectURL(previewUrl);
               setPreviewUrl(selected ? URL.createObjectURL(selected) : null);
             }}
           />
