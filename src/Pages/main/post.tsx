@@ -1,19 +1,13 @@
 import { addDoc, getDocs, collection, query, where, deleteDoc, doc, orderBy, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { Post as IPost } from './main';
 import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect, useState, useCallback } from 'react';
 import { Loader } from '../../components/Loader';
 import { useToast } from '../../components/Toast';
+import { PostType, Like } from '../../types/post';
 
- 
 interface Props {
-  post: IPost;
-}
-
-interface Like{
-  likeId: string;
-  userId: string;
+  post: PostType;
 }
 
 export const Post = (props: Props) => {
@@ -377,18 +371,18 @@ export const Post = (props: Props) => {
           />
           <button
             onClick={handleAddComment}
-            disabled={!user || !newComment.trim()}
+            disabled={!user || !newComment.trim() || commentLoading}
             style={{
               backgroundColor: '#3b82f6',
               color: 'white',
               border: 'none',
               padding: '8px 15px',
               borderRadius: '6px',
-              cursor: (!user || !newComment.trim()) ? 'not-allowed' : 'pointer',
-              opacity: (!user || !newComment.trim()) ? 0.7 : 1,
+              cursor: (!user || !newComment.trim() || commentLoading) ? 'not-allowed' : 'pointer',
+              opacity: (!user || !newComment.trim() || commentLoading) ? 0.7 : 1,
             }}
           >
-            Comment
+            {commentLoading ? 'Posting...' : 'Comment'}
           </button>
         </div>
       </div>

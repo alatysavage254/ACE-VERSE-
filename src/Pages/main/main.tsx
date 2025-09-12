@@ -2,26 +2,17 @@ import { getDocs, collection } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../../config/firebase';
 import { Post } from './post';
+import type { PostType } from '../../types/post';
 import { Loader } from '../../components/Loader';
 
-export interface Post {
-  id: string;
-  userId: string;
-  title: string;
-  username: string | null;
-  description: string;
-  imageUrl?: string;
-  createdAt?: any; // Consider using FirebaseTimestamp type
-}
-
 export const Main = () => {
-  const [postsList, setPostsList] = useState<Post[] | null>(null);
+  const [postsList, setPostsList] = useState<PostType[] | null>(null);
  
     useEffect (() => {
       const fetchPosts = async () => {
         const data = await getDocs(collection(db, "posts"));
         setPostsList(
-          data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as Post[]
+          data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as PostType[]
         );
       };
       fetchPosts();
