@@ -1,5 +1,5 @@
 import { addDoc, getDocs, collection, query, where, deleteDoc, doc, orderBy, serverTimestamp, updateDoc } from 'firebase/firestore';
-import {  HOOD as IPost } from './main';
+import { Post as IPost } from './main';
 import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect, useState, useCallback } from 'react';
@@ -150,6 +150,8 @@ export const Post = (props: Props) => {
     }
   };
 
+  const [commentLoading, setCommentLoading] = useState(false);
+
   const handleAddComment = async () => {
     if (!user) {
       alert('You must be signed in to comment.');
@@ -157,6 +159,8 @@ export const Post = (props: Props) => {
     }
     const trimmed = newComment.trim();
     if (!trimmed) return;
+    
+    setCommentLoading(true);
     try {
       await addDoc(commentsRef, {
         text: trimmed,
@@ -170,6 +174,8 @@ export const Post = (props: Props) => {
     } catch (e) {
       console.error(e);
       alert('Failed to add comment');
+    } finally {
+      setCommentLoading(false);
     }
   };
 
@@ -228,22 +234,7 @@ export const Post = (props: Props) => {
           <div style={{ margin: '10px 0' }}>
             <img
               src={(post as any).imageUrl as string}
-              alt={post.title}
-              style={{
-                maxWidth: '100%',
-                borderRadius: 8,
-                display: 'block',
-                margin: '0 auto'
-              }}
-            />
-          </div>
-        )}
-        {/** Image thumbnail */}
-        {Boolean((post as any).imageUrl) && (
-          <div style={{ margin: '10px 0' }}>
-            <img
-              src={(post as any).imageUrl as string}
-              alt={currentTitle}
+              alt={editing ? currentTitle : post.title}
               style={{
                 maxWidth: '100%',
                 borderRadius: 8,
