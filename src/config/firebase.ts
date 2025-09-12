@@ -19,9 +19,14 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase services
-export const db = getFirestore(app);
+// Initialize Firebase services with settings
 export const auth = getAuth(app);
+auth.useDeviceLanguage(); // Set language to device language
+
+// Initialize Firestore with settings
+export const db = getFirestore(app);
+
+// Initialize Storage with settings
 export const storage = getStorage(app);
 
 // Configure Google Auth Provider

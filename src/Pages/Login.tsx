@@ -3,6 +3,7 @@ import { auth, db, provider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { AppError, FirebaseAuthError } from '../types/errors';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -26,8 +27,9 @@ export const Login = () => {
         }, { merge: true });
       }
       navigate('/');
-    } catch (error: any) {
-      if (error?.code === 'auth/cancelled-popup-request') {
+    } catch (error: unknown) {
+      const appError = error as AppError;
+      if ((appError as FirebaseAuthError)?.code === 'auth/cancelled-popup-request') {
         console.warn('Sign-in popup cancelled or another popup in progress.');
       } else {
         console.error('Sign-in error:', error);
@@ -39,15 +41,36 @@ export const Login = () => {
   };
 
   return (
-    <div className="container" style={{
-      maxWidth: '400px',
+    <div className="login-container" style={{
+      maxWidth: '800px',
       minHeight: '80vh',
+      margin: '0 auto',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'space-between',
+      padding: '2rem',
     }}>
-      <div className="card" style={{
-        width: '100%',
+      <div className="login-image" style={{
+        flex: '1',
+        maxWidth: '50%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <img 
+          src={require('../assets/mandem.png')} 
+          alt="Login" 
+          style={{
+            maxWidth: '100%',
+            height: 'auto',
+            borderRadius: '15px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+          }}
+        />
+      </div>
+      <div className="login-card" style={{
+        flex: '1',
+        maxWidth: '400px',
         textAlign: 'center',
         padding: '2rem'
       }}>

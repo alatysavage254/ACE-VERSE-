@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import styles from '../styles/post.module.css';
 
 interface PostProps {
   id: string;
@@ -40,25 +41,18 @@ export const Post = ({ id, title, description, username, userId, onDelete }: Pos
   };
 
   return (
-    <div className="post" style={{ border: '1px solid #ccc', padding: '1rem', margin: '1rem 0' }}>
-      <h3>{title}</h3>
-      <p>{description}</p>
-      <p>Posted by: {username}</p>
+    <div className={styles.post}>
+      <h3 className={styles.title}>{title}</h3>
+      <p className={styles.description}>{description}</p>
+      <p className={styles.author}>{username}</p>
       
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className={styles.error}>{error}</p>}
       
       {user?.uid === userId && (
         <button 
           onClick={handleDelete} 
           disabled={deleting}
-          style={{ 
-            backgroundColor: '#ff4444',
-            color: 'white',
-            border: 'none',
-            padding: '0.5rem 1rem',
-            cursor: deleting ? 'not-allowed' : 'pointer',
-            opacity: deleting ? 0.7 : 1
-          }}
+          className={styles.deleteButton}
         >
           {deleting ? 'Deleting...' : 'Delete Post'}
         </button>

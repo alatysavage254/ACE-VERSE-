@@ -37,7 +37,7 @@ export const Profile = () => {
         }
         const postsQ = query(collection(db, 'posts'), where('userId', '==', uid));
         const postsSnap = await getDocs(postsQ);
-        setPosts(postsSnap.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as Post[]);
+        setPosts(postsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Post)));
       } finally {
         setLoading(false);
       }

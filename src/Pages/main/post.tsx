@@ -1,10 +1,11 @@
-import { addDoc, getDocs, collection, query, where, deleteDoc, doc, orderBy, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, getDocs, collection, query, where, deleteDoc, doc, orderBy, serverTimestamp, updateDoc, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect, useState, useCallback } from 'react';
 import { Loader } from '../../components/Loader';
 import { useToast } from '../../components/Toast';
 import { PostType, Like } from '../../types/post';
+import { AppError } from '../../types/errors';
 
 interface Props {
   post: PostType;
@@ -33,20 +34,20 @@ export const Post = (props: Props) => {
     setLikes(data.docs.map((doc) => ({ userId: doc.data().userId, likeId: doc.id })));
   }, [likesDoc]);
 
-  type Comment = {
+  interface Comment {
     id: string;
     userId: string;
     username: string | null;
     text: string;
-    createdAt?: any;
-  };
+    createdAt: Timestamp;
+  }
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [newComment, setNewComment] = useState("");
 
   const getComments = useCallback(async () => {
     const data = await getDocs(commentsQuery);
     setComments(
-      data.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Comment[]
+      data.docs.map((d) => ({ id: d.id, ...d.data() } as Comment))
     );
   }, [commentsQuery]);
 
@@ -198,12 +199,16 @@ export const Post = (props: Props) => {
 
   return (
     <div style={{
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-      padding: '15px',
-      margin: '10px 0',
-      backgroundColor: 'white',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      borderRadius: '12px',
+      padding: '20px',
+      margin: '15px 0',
+      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+      backdropFilter: 'blur(8px)',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      cursor: 'default',
+      color: '#1a1a1a'
     }}>
       <div style={{ marginBottom: '10px' }}>
         {editing ? (
@@ -213,11 +218,14 @@ export const Post = (props: Props) => {
             style={{
               width: '100%',
               padding: '8px',
-              border: '1px solid #e5e7eb',
-              borderRadius: 6,
-              marginBottom: 10,
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              marginBottom: '10px',
               fontSize: '1.1em',
-              fontWeight: 600,
+              fontWeight: '600',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(4px)',
+              color: '#1a1a1a'
             }}
           />
         ) : (
@@ -246,9 +254,12 @@ export const Post = (props: Props) => {
             style={{
               width: '100%',
               padding: '8px',
-              border: '1px solid #e5e7eb',
-              borderRadius: 6,
-              marginBottom: 10,
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              marginBottom: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(4px)',
+              color: '#1a1a1a'
             }}
           />
         ) : (
@@ -367,7 +378,15 @@ export const Post = (props: Props) => {
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={user ? 'Write a comment…' : 'Sign in to comment'}
             disabled={!user}
-            style={{ flex: 1, padding: 8, border: '1px solid #e5e7eb', borderRadius: 6 }}
+            style={{
+              flex: 1,
+              padding: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(4px)',
+              color: '#1a1a1a'
+            }}
           />
           <button
             onClick={handleAddComment}

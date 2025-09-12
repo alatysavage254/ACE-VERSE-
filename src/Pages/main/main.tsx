@@ -4,6 +4,7 @@ import { db } from '../../config/firebase';
 import { Post } from './post';
 import type { PostType } from '../../types/post';
 import { Loader } from '../../components/Loader';
+import styles from '../../styles/main.module.css';
 
 export const Main = () => {
   const [postsList, setPostsList] = useState<PostType[] | null>(null);
@@ -19,30 +20,32 @@ export const Main = () => {
     }, []);
 
     return (
-      <div className="container" style={{ padding: '2rem 20px' }}> 
-        <h1 style={{ 
-          fontSize: '2rem', 
-          fontWeight: '600', 
-          color: '#1f2937',
-          marginBottom: '2rem',
-          textAlign: 'center'
-        }}>
-          Recent Posts
-        </h1>
-        {!postsList && <Loader />}
-        {postsList?.length === 0 && (
-          <div style={{ 
-            textAlign: 'center', 
-            color: '#6b7280',
-            marginTop: '2rem' 
-          }}>
-            No posts yet. Be the first to create one!
+      <div className={styles.mainContainer}> 
+        <div className={styles.contentWrapper}>
+          <h1 className={styles.title}>
+            Recent Posts
+            <div className={styles.titleUnderline} />
+          </h1>
+
+          {!postsList && (
+            <div className={styles.loaderContainer}>
+              <Loader />
+            </div>
+          )}
+
+          {postsList?.length === 0 && (
+            <div className={styles.emptyState}>
+              No posts yet. Be the first to create one!
+            </div>
+          )}
+
+          <div className={styles.postsGrid}>
+            {postsList?.map((post) => (
+              <div key={post.id} className={styles.postContainer}>
+                <Post post={post} />
+              </div>
+            ))}
           </div>
-        )}
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          {postsList?.map((post) => (
-            <Post key={post.id} post={post} />
-          ))}
         </div>
       </div>
     );

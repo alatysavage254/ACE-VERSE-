@@ -8,14 +8,15 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { Loader } from '../../components/Loader';
-//import { Loader } from '../../components/Loader';
+import { AppError } from '../../types/errors';
+import '../../styles/create-form.css';
+import defaultImageSrc from '../../assets/wis.png';
 
 interface CreateFormData {
   title: string;
   description: string;
 }
 export const CreateForm = () => {
-
   const [user, authLoading] = useAuthState(auth);
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
@@ -65,9 +66,10 @@ export const CreateForm = () => {
         createdAt: serverTimestamp(),
       });
       navigate('/');
-    } catch (error: any) {
-      console.error('Failed to create post', error);
-      setSubmitError(error?.message || 'Failed to create post');
+    } catch (error: unknown) {
+      const appError = error as AppError;
+      console.error('Failed to create post', appError);
+      setSubmitError(appError?.message || 'Failed to create post');
     } finally {
       setSubmitting(false);
     }
@@ -76,18 +78,17 @@ export const CreateForm = () => {
   if (authLoading) return <Loader />;
 
   return (
-    <div className="container" style={{ maxWidth: '600px', padding: '2rem 20px' }}>
-      <h1 style={{ 
-        fontSize: '2rem', 
-        fontWeight: '600', 
-        color: '#1f2937',
-        marginBottom: '2rem',
-        textAlign: 'center'
-      }}>
-        Create a New Post
-      </h1>
+    <div className="create-form-container">
+      <div className="form-image-section">
+        <img 
+          src={defaultImageSrc} 
+          alt="Create Post" 
+          className="form-image"
+        />
+        <h2 className="form-title">Share Your Story</h2>
+      </div>
 
-      <form onSubmit={handleSubmit(onCreatePost)} className="card">
+      <form onSubmit={handleSubmit(onCreatePost)} className="form-section">
         {!user && (
           <div style={{
             backgroundColor: '#fee2e2',

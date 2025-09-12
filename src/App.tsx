@@ -7,9 +7,10 @@ import { CreatePost } from "./Pages/create-post/create-post";
 import { Profile } from "./Pages/profile/Profile";
 import './styles/global.css';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
     element: (
       <div className="App">
         <Navbar />
@@ -44,7 +45,8 @@ const router = createBrowserRouter([
       </div>
     ),
   },
-]);
+  ]
+);
 
 function App() {
   return <RouterProvider router={router} />;
