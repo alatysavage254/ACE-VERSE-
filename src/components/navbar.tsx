@@ -19,28 +19,45 @@ const signUserOut = async () =>  {
 }
   return (
     <div className="navbar">
-      <div className="links">
-        <Link to="/">Home</Link>
-        {!user ? (
-          <Link to = "/login"> Login </Link>
-        ) : (
-        
-        <Link to="/createpost">Create Post</Link>
-        )}
+      <div className="brand">
+        <h1 className="wizard-title">Wizard Alaty</h1>
       </div>
-    
-    <div className="user">
-      {user && (
-      <>
-     <p> {user?.displayName} </p>
-      <Link to={`/profile/${user.uid}`}>
-        <img src={user?.photoURL || ""} width="20" height="20" alt="Random" />
-      </Link>
-      <button onClick={signUserOut}> Log Out</button>
-      </>
-      )}
-      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} style={{ marginLeft: 12 }}> {theme === 'light' ? 'Dark' : 'Light'} </button>
-    </div>
+      <div className="nav-content">
+        <div className="links">
+          <Link to="/" className="nav-link">
+            <span>Home</span>
+          </Link>
+          {!user ? (
+            <Link to="/login" className="nav-link">
+              <span>Login</span>
+            </Link>
+          ) : (
+            <Link to="/createpost" className="nav-link">
+              <span>Create Post</span>
+            </Link>
+          )}
+        </div>
+        
+        <div className="user">
+          {user && (
+            <>
+              <div className="user-info">
+                <p className="user-name">{user?.displayName}</p>
+                <Link to={`/profile/${user.uid}`} className="profile-link">
+                  <img src={user?.photoURL || ""} width="40" height="40" alt="Profile" className="profile-img" />
+                </Link>
+              </div>
+              <button onClick={signUserOut} className="nav-button logout-btn">Log Out</button>
+            </>
+          )}
+          <button 
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
+            className={`nav-button theme-btn ${theme}`}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
