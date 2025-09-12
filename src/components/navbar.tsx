@@ -20,7 +20,7 @@ const signUserOut = async () =>  {
   return (
     <div className="navbar">
       <div className="brand">
-        <h1 className="wizard-title">Wizard Alaty</h1>
+        <h1 className="wizard-title">ACE VERSE</h1>
       </div>
       <div className="nav-content">
         <div className="links">
