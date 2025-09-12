@@ -142,8 +142,23 @@ export const CreateForm = () => {
             disabled={submitting || !user}
             onChange={(e) => {
               const selected = e.target.files?.[0] || null;
-              setFile(selected);
-              setPreviewUrl(selected ? URL.createObjectURL(selected) : null);
+              if (selected) {
+                // Check file size (5MB limit)
+                if (selected.size > 5 * 1024 * 1024) {
+                  alert('File size must be less than 5MB');
+                  return;
+                }
+                // Check file type
+                if (!selected.type.startsWith('image/')) {
+                  alert('File must be an image');
+                  return;
+                }
+                setFile(selected);
+                setPreviewUrl(URL.createObjectURL(selected));
+              } else {
+                setFile(null);
+                setPreviewUrl(null);
+              }
             }}
           />
           {previewUrl && (

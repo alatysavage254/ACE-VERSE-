@@ -4,34 +4,28 @@ import { db } from '../../config/firebase';
 import { Post } from './post';
 import { Loader } from '../../components/Loader';
 
-export interface HOOD {
+export interface Post {
   id: string;
   userId: string;
   title: string;
-  username: string;
+  username: string | null;
   description: string;
+  imageUrl?: string;
+  createdAt?: any; // Consider using FirebaseTimestamp type
 }
 
 export const Main = () => {
-  const [postsList, setPostsList] = useState<HOOD[] | null>(null);
+  const [postsList, setPostsList] = useState<Post[] | null>(null);
  
-    useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const postsCollection = collection(db, "posts");
-        const data = await getDocs(postsCollection);
-        const posts = data.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id
-        })) as HOOD[];
-        setPostsList(posts);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-        setPostsList([]);
-      }
-    };
-    fetchPosts();
-  }, []);
+    useEffect (() => {
+      const fetchPosts = async () => {
+        const data = await getDocs(collection(db, "posts"));
+        setPostsList(
+          data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as Post[]
+        );
+      };
+      fetchPosts();
+    }, []);
 
     return (
       <div className="container" style={{ padding: '2rem 20px' }}> 

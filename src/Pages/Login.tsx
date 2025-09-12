@@ -1,31 +1,38 @@
 import React, { useState } from 'react';
-import { auth, provider } from '../config/firebase';
+import { auth, db, provider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 export const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const signInWithGoogle = async () => {
-    if (loading) return;
+    if (loading) return; // prevent multiple popups
     setLoading(true);
-    
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log("Successfully signed in:", result.user.displayName);
+      const u = result.user;
+      if (u?.uid) {
+        const userDoc = doc(db, 'users', u.uid);
+        await setDoc(userDoc, {
+          uid: u.uid,
+          displayName: u.displayName || null,
+          photoURL: u.photoURL || null,
+          email: u.email || null,
+          updatedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+        }, { merge: true });
+      }
       navigate('/');
     } catch (error: any) {
-      console.error('Sign-in error:', error);
-      
-      // Handle specific error cases
-      const errorMessage = error.code === 'auth/popup-closed-by-user'
-        ? 'Sign-in cancelled. Please try again.'
-        : error.code === 'auth/popup-blocked'
-        ? 'Pop-up was blocked by your browser. Please allow pop-ups for this site.'
-        : 'Failed to sign in. Please try again.';
-      
-      alert(errorMessage);
+      if (error?.code === 'auth/cancelled-popup-request') {
+        console.warn('Sign-in popup cancelled or another popup in progress.');
+      } else {
+        console.error('Sign-in error:', error);
+        alert('Sign-in failed. Check the console for details.');
+      }
     } finally {
       setLoading(false);
     }

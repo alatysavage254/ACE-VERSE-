@@ -4,6 +4,7 @@ import { Main } from "./Pages/main/main";
 import { Login } from "./Pages/Login";
 import { Navbar } from "./components/navbar";
 import { CreatePost } from "./Pages/create-post/create-post";
+import { Profile } from "./Pages/profile/Profile";
 import './styles/global.css';
 
 const router = createBrowserRouter([
@@ -31,6 +32,15 @@ const router = createBrowserRouter([
       <div className="App">
         <Navbar />
         <CreatePost />
+      </div>
+    ),
+  },
+  {
+    path: "/profile/:uid",
+    element: (
+      <div className="App">
+        <Navbar />
+        <Profile />
       </div>
     ),
   },
