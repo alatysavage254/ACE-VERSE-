@@ -5,7 +5,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { Loader } from '../../components/Loader';
 import { useToast } from '../../components/Toast';
 import { PostType, Like } from '../../types/post';
-import { AppError } from '../../types/errors';
 
 interface Props {
   post: PostType;
