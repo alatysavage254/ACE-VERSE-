@@ -1,10 +1,7 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth,GoogleAuthProvider} from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -19,18 +16,18 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase services with settings
+// Initialize Firebase services
 export const auth = getAuth(app);
-auth.useDeviceLanguage(); // Set language to device language
+auth.useDeviceLanguage();
 
-// Initialize Firestore with settings
+// Initialize Firestore
 export const db = getFirestore(app);
 
-// Initialize Storage with settings
+// Initialize Storage
 export const storage = getStorage(app);
 
-// Configure Google Auth Provider
-export const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
+// Configure and export Google Auth Provider
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
   prompt: 'select_account'
 });

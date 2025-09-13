@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth, db, provider } from '../config/firebase';
+import { auth, db, googleProvider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
@@ -13,7 +13,7 @@ export const Login = () => {
     if (loading) return; // prevent multiple popups
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, googleProvider);
       const u = result.user;
       if (u?.uid) {
         const userDoc = doc(db, 'users', u.uid);
