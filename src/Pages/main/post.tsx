@@ -96,10 +96,6 @@ export const Post = (props: Props) => {
       addToast('Failed to unlike post');
     }
   };
-
-  };
-
-  
   
   const hasUserLiked = likes?.find((like) => like.userId === user?.uid);
   
