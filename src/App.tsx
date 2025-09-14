@@ -6,7 +6,6 @@ import { Navbar } from "./components/navbar";
 import { CreatePost } from "./Pages/create-post/create-post";
 import { Profile } from "./Pages/profile/Profile";
 import './App.css';
-import { ToastProvider } from "./components/Toast";
 
 const router = createBrowserRouter([
   {
@@ -47,10 +46,10 @@ const router = createBrowserRouter([
   }
 ]);
 
-export function App() {
+const App = () => {
   return (
-    <ToastProvider>
-      <RouterProvider router={router} />
-    </ToastProvider>
+    <RouterProvider router={router} />
   );
 }
+
+export default App;

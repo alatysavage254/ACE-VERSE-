@@ -52,7 +52,7 @@ export const Post = (props: Props) => {
 
   const addLike = async () => {
     if (!user) {
-      alert('You must be signed in to like posts.');
+      addToast('You must be signed in to like posts.');
       return;
     }
     try {
@@ -60,16 +60,18 @@ export const Post = (props: Props) => {
       setLikes((prev) =>
         prev ? [...prev, { userId: user.uid, likeId: newDoc.id }] : [{ userId: user.uid, likeId: newDoc.id }]
       );
-      if (user.uid !== post.userId) addToast('Someone liked your post');
-    } catch (err) {
-      console.log(err);
+      if (user.uid !== post.userId) {
+        addToast('Someone liked your post');
+      }
+    } catch (error) {
+      console.error('Failed to add like:', error);
+      addToast('Failed to like post');
     }
-
   };
 
   const removeLike = async () => {
     if (!user) {
-      alert('You must be signed in to unlike posts.');
+      addToast('You must be signed in to unlike posts.');
       return;
     }
     try {
@@ -77,7 +79,7 @@ export const Post = (props: Props) => {
         likesRef,
         where("postId", "==", post.id),
         where("userId", "==", user.uid)
-        );
+      );
 
       const likeToDeleteData = await getDocs(likeToDeleteQuery);
       if (likeToDeleteData.empty) {
@@ -85,13 +87,15 @@ export const Post = (props: Props) => {
       }
       const likeId = likeToDeleteData.docs[0].id;
       const likeToDelete = doc(db, "likes", likeId);
-    await deleteDoc(likeToDelete);
-    setLikes (
-      (prev) => prev && prev.filter((like) => like.likeId !== likeId)
-    );
-  }  catch (err) {
-    console.log(err);
-  }
+      await deleteDoc(likeToDelete);
+      setLikes(
+        (prev) => prev && prev.filter((like) => like.likeId !== likeId)
+      );
+    } catch (error) {
+      console.error('Failed to remove like:', error);
+      addToast('Failed to unlike post');
+    }
+  };
 
   };
 
