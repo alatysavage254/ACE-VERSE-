@@ -44,7 +44,7 @@ const router = createBrowserRouter([
       </div>
     ),
   },
-]);
+], { future: { v7_startTransition: true } } as any);
 
 function App() {
   return <RouterProvider router={router} />;
