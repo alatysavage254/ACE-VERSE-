@@ -16,15 +16,19 @@ export const Login = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const u = result.user;
       if (u?.uid) {
-        const userDoc = doc(db, 'users', u.uid);
-        await setDoc(userDoc, {
-          uid: u.uid,
-          displayName: u.displayName || null,
-          photoURL: u.photoURL || null,
-          email: u.email || null,
-          updatedAt: serverTimestamp(),
-          createdAt: serverTimestamp(),
-        }, { merge: true });
+        try {
+          const userDoc = doc(db, 'users', u.uid);
+          await setDoc(userDoc, {
+            uid: u.uid,
+            displayName: u.displayName || null,
+            photoURL: u.photoURL || null,
+            email: u.email || null,
+            updatedAt: serverTimestamp(),
+            createdAt: serverTimestamp(),
+          }, { merge: true });
+        } catch (err) {
+          console.warn('Skipping user profile write due to permissions:', err);
+        }
       }
       navigate('/');
     } catch (error: unknown) {

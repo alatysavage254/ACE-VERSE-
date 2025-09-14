@@ -5,12 +5,12 @@ import { Login } from "./Pages/Login";
 import { Navbar } from "./components/navbar";
 import { CreatePost } from "./Pages/create-post/create-post";
 import { Profile } from "./Pages/profile/Profile";
-import './styles/global.css';
+import './App.css';
+import { ToastProvider } from "./components/Toast";
 
-const router = createBrowserRouter(
-  [
-    {
-      path: "/",
+const router = createBrowserRouter([
+  {
+    path: "/",
     element: (
       <div className="App">
         <Navbar />
@@ -44,12 +44,13 @@ const router = createBrowserRouter(
         <Profile />
       </div>
     ),
-  },
-  ]
-);
+  }
+]);
 
-function App() {
-  return <RouterProvider router={router} />;
+export function App() {
+  return (
+    <ToastProvider>
+      <RouterProvider router={router} />
+    </ToastProvider>
+  );
 }
-
-export default App;
