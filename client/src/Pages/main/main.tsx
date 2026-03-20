@@ -1,4 +1,3 @@
-import React from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import { usePosts } from "../../hooks/usePosts";

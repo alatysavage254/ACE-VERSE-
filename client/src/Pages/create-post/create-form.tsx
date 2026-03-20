@@ -155,7 +155,7 @@ export const CreateForm = () => {
     try {
       const username = profile?.username || user.displayName || "User";
       const imageUrl = imagePreview || "";
-      await createPost(user.uid, username, data.title, data.description, imageUrl);
+      await createPost(user.uid || "", username, data.title, data.description, imageUrl);
       navigate('/');
       addToast("Post created");
     } catch (error: unknown) {
