@@ -1,115 +1,103 @@
-import React, { useState } from 'react';
-import { auth, db, googleProvider } from '../config/firebase';
-import { signInWithPopup } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { AppError, FirebaseAuthError } from '../types/errors';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login, register } from "../services/auth.service";
+import { useToast } from "../components/Toast";
+import { useAuthContext } from "../context/AuthContext";
 
 export const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const { addToast } = useToast();
+  const { setUser, setProfile } = useAuthContext();
 
-  const signInWithGoogle = async () => {
-    if (loading) return; // prevent multiple popups
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loading) return;
     setLoading(true);
+    
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const u = result.user;
-      if (u?.uid) {
-        try {
-          const userDoc = doc(db, 'users', u.uid);
-          await setDoc(userDoc, {
-            uid: u.uid,
-            displayName: u.displayName || null,
-            photoURL: u.photoURL || null,
-            email: u.email || null,
-            updatedAt: serverTimestamp(),
-            createdAt: serverTimestamp(),
-          }, { merge: true });
-        } catch (err) {
-          console.warn('Skipping user profile write due to permissions:', err);
-        }
-      }
-      navigate('/');
-    } catch (error: unknown) {
-      const appError = error as AppError;
-      if ((appError as FirebaseAuthError)?.code === 'auth/cancelled-popup-request') {
-        console.warn('Sign-in popup cancelled or another popup in progress.');
+      let userData;
+      if (isRegister) {
+        userData = await register(email, password, username);
+        addToast("Account created successfully");
       } else {
-        console.error('Sign-in error:', error);
-        alert('Sign-in failed. Check the console for details.');
+        userData = await login(email, password);
+        addToast("Welcome back");
       }
+      setUser(userData);
+      setProfile(userData);
+      navigate("/");
+    } catch (error: any) {
+      console.error("Auth error:", error);
+      addToast(error.response?.data?.message || "Authentication failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container" style={{
-      maxWidth: '800px',
-      minHeight: '80vh',
-      margin: '0 auto',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '2rem',
-    }}>
-      <div className="login-image" style={{
-        flex: '1',
-        maxWidth: '50%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
+    <div className="mx-auto flex min-h-[80vh] max-w-5xl items-center justify-between gap-8 px-4 py-8">
+      <div className="hidden flex-1 items-center justify-center md:flex">
         <img 
           src={require('../assets/mandem.png')} 
           alt="Login" 
-          style={{
-            maxWidth: '100%',
-            height: 'auto',
-            borderRadius: '15px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-          }}
+          className="h-auto max-w-full rounded-2xl shadow-2xl"
         />
       </div>
-      <div className="login-card" style={{
-        flex: '1',
-        maxWidth: '400px',
-        textAlign: 'center',
-        padding: '2rem'
-      }}>
-        <h1 style={{
-          fontSize: '1.5rem',
-          fontWeight: '600',
-          color: '#1f2937',
-          marginBottom: '1.5rem'
-        }}>
-          Welcome Back
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <h1 className="mb-4 text-3xl font-semibold text-slate-900">
+          {isRegister ? "Create Account" : "Welcome Back"}
         </h1>
-        <p style={{
-          color: '#6b7280',
-          marginBottom: '2rem'
-        }}>
-          Sign in with Google to start posting
+        <p className="mb-8 text-slate-600">
+          {isRegister ? "Sign up to start posting" : "Sign in to continue"}
         </p>
-        <button
-          onClick={signInWithGoogle}
-          disabled={loading}
-          className="btn btn-primary"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            margin: '0 auto',
-            padding: '0.75rem 1.5rem'
-          }}
-        >
-          <img 
-            src="https://www.google.com/favicon.ico" 
-            alt="Google"
-            style={{ width: '20px', height: '20px' }}
+        
+        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+          {isRegister && (
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full rounded-lg border-2 border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
+            />
+          )}
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full rounded-lg border-2 border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
           />
-          {loading ? 'Signing in...' : 'Continue with Google'}
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            className="w-full rounded-lg border-2 border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+          >
+            {loading ? 'Please wait...' : (isRegister ? 'Sign Up' : 'Sign In')}
+          </button>
+        </form>
+        
+        <button
+          onClick={() => setIsRegister(!isRegister)}
+          className="mt-4 text-sm text-indigo-600 hover:underline"
+        >
+          {isRegister ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
         </button>
       </div>
     </div>

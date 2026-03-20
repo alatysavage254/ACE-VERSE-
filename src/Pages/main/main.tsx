@@ -1,54 +1,60 @@
-import { getDocs, collection, orderBy, query, limit } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
-import { db } from '../../config/firebase';
-import { Post } from './post';
-import type { PostType } from '../../types/post';
-import { Loader } from '../../components/Loader';
-import styles from '../../styles/main.module.css';
+import React from "react";
+import { useAuthContext } from "../../context/AuthContext";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import { usePosts } from "../../hooks/usePosts";
+import { PostCard } from "../../components/PostCard";
+import { PostSkeleton } from "../../components/SkeletonLoader";
 
 export const Main = () => {
-  const [postsList, setPostsList] = useState<PostType[] | null>(null);
- 
-    useEffect (() => {
-      const fetchPosts = async () => {
-        const postsQuery = query(collection(db, "posts"), orderBy('createdAt', 'desc'), limit(20));
-        const data = await getDocs(postsQuery);
-        setPostsList(
-          data.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as PostType[]
-        );
-      };
-      fetchPosts();
-    }, []);
+  const { user, profileLoading } = useAuthContext();
+  const userId = user?._id || user?.uid;
+  const { posts, loading, loadingMore, hasMore, loadMore } = usePosts(userId, 10);
 
-    return (
-      <div className={styles.mainContainer}> 
-        <div className={styles.contentWrapper}>
-          <h1 className={styles.title}>
-            Recent Posts
-            <div className={styles.titleUnderline} />
-          </h1>
+  const sentinelRef = useInfiniteScroll(loadMore, hasMore, loading || loadingMore || profileLoading);
 
-          {!postsList && (
-            <div className={styles.loaderContainer}>
-              <Loader />
-            </div>
-          )}
-
-          {postsList?.length === 0 && (
-            <div className={styles.emptyState}>
-              No posts yet. Be the first to create one!
-            </div>
-          )}
-
-          <div className={styles.postsGrid}>
-            {postsList?.map((post) => (
-              <div key={post.id} className={styles.postContainer}>
-                <Post post={post} />
-              </div>
-            ))}
-          </div>
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 py-6">
+      <div className="mb-4 flex items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Feed</h1>
+          <p className="mt-1 text-sm text-slate-600">Infinite scroll + realtime updates</p>
         </div>
       </div>
-    );
+
+      {loading && posts.length === 0 ? (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <PostSkeleton key={i} />
+          ))}
+        </div>
+      ) : null}
+
+      {!loading && posts.length === 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-6 text-slate-600">
+          No posts yet. Follow people and start sharing.
+        </div>
+      ) : null}
+
+      <div className="space-y-4">
+        {posts.map((p) => (
+          <PostCard key={p.id || p._id} post={p} />
+        ))}
+      </div>
+
+      {loadingMore ? (
+        <div className="mt-4 space-y-4">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <PostSkeleton key={i} />
+          ))}
+        </div>
+      ) : null}
+
+      <div ref={sentinelRef} className="h-10" />
+
+      {!hasMore && posts.length > 0 && !loading ? (
+        <div className="py-6 text-center text-sm text-slate-500">You reached the end</div>
+      ) : null}
+    </div>
+  );
 };
 

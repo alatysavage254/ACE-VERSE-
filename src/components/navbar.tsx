@@ -1,61 +1,76 @@
+import React from "react";
 import { Link } from "react-router-dom";
-import { auth } from '../config/firebase';
-import { useAuthState } from "react-firebase-hooks/auth";
-import { signOut } from 'firebase/auth';
-import "../App.css"
-import React, { useEffect, useState } from 'react';
+import { logout } from "../services/auth.service";
+import { useAuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 export const Navbar = () => {
-const [user] = useAuthState(auth);
-const [theme, setTheme] = useState<string>(() => localStorage.getItem('theme') || 'light');
+  const { user, profile, setUser, setProfile } = useAuthContext();
+  const navigate = useNavigate();
+  const [theme, setTheme] = React.useState<string>(() => localStorage.getItem("theme") || "light");
 
-useEffect(() => {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('theme', theme);
-}, [theme]);
+  React.useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
-const signUserOut = async () =>  {
-  await signOut(auth);
+  const signUserOut = async () => {
+    logout();
+    setUser(null);
+    setProfile(null);
+    navigate("/login");
+  };
 
-}
+  const displayName = profile?.username || user?.username || "User";
+  const photoUrl = profile?.photoURL || user?.photoURL || "";
+  const userId = user?._id || user?.uid || "";
+
   return (
-    <div className="navbar">
-      <div className="brand">
-        <h1 className="wizard-title">ACE VERSE</h1>
-      </div>
-      <div className="nav-content">
-        <div className="links">
-          <Link to="/" className="nav-link">
-            <span>Home</span>
-          </Link>
-          {!user ? (
-            <Link to="/login" className="nav-link">
-              <span>Login</span>
+    <div className="sticky top-0 z-50 bg-gradient-to-r from-indigo-700 to-cyan-500 text-white shadow">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <Link to="/" className="font-bold tracking-wide">
+          <span className="text-lg sm:text-xl">ACE VERSE</span>
+        </Link>
+
+        <div className="flex items-center gap-6">
+          <div className="hidden items-center gap-4 sm:flex">
+            <Link to="/" className="hover:opacity-90">
+              Home
             </Link>
-          ) : (
-            <Link to="/createpost" className="nav-link">
-              <span>Create Post</span>
-            </Link>
-          )}
-        </div>
-        
-        <div className="user">
-          {user && (
-            <>
-              <div className="user-info">
-                <p className="user-name">{user?.displayName}</p>
-                <Link to={`/profile/${user.uid}`} className="profile-link">
-                  <img src={user?.photoURL || ""} width="40" height="40" alt="Profile" className="profile-img" />
-                </Link>
-              </div>
-              <button onClick={signUserOut} className="nav-button logout-btn">Log Out</button>
-            </>
-          )}
-          <button 
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
-            className={`nav-button theme-btn ${theme}`}
-          >
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
+            {!user ? (
+              <Link to="/login" className="hover:opacity-90">
+                Login
+              </Link>
+            ) : (
+              <Link to="/createpost" className="hover:opacity-90">
+                Create Post
+              </Link>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            {user ? (
+              <>
+                <div className="hidden items-center gap-3 sm:flex">
+                  <Link to={`/profile/${userId}`} className="flex items-center gap-3">
+                    <img src={photoUrl} width={36} height={36} alt="Profile" className="h-9 w-9 rounded-full border border-white/70 object-cover" />
+                    <span className="text-sm font-medium">{displayName}</span>
+                  </Link>
+                </div>
+                <button onClick={signUserOut} className="rounded-md bg-white/10 px-3 py-1 text-sm hover:bg-white/20">
+                  Log Out
+                </button>
+              </>
+            ) : null}
+
+            <button
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className="rounded-md bg-white/10 px-3 py-1 text-sm hover:bg-white/20"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? "🌙" : "☀️"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

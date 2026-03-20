@@ -1,55 +1,74 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Main } from "./Pages/main/main";
-import { Login } from "./Pages/Login";
 import { Navbar } from "./components/navbar";
-import { CreatePost } from "./Pages/create-post/create-post";
-import { Profile } from "./Pages/profile/Profile";
-import './App.css';
+import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./components/Toast";
+
+const MainPage = React.lazy(() =>
+  import("./Pages/main/main").then((m) => ({ default: m.Main }))
+);
+const LoginPage = React.lazy(() =>
+  import("./Pages/Login").then((m) => ({ default: m.Login }))
+);
+const CreatePostPage = React.lazy(() =>
+  import("./Pages/create-post/create-post").then((m) => ({ default: m.CreatePost }))
+);
+const ProfilePage = React.lazy(() =>
+  import("./Pages/profile/Profile").then((m) => ({ default: m.Profile }))
+);
+
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Navbar />
+      <Suspense fallback={<div className="mx-auto w-full max-w-5xl px-4 py-8 text-slate-600">Loading...</div>}>
+        {children}
+      </Suspense>
+    </div>
+  );
+};
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <div className="App">
-        <Navbar />
-        <Main />
-      </div>
+      <Layout>
+        <MainPage />
+      </Layout>
     ),
   },
   {
     path: "/login",
     element: (
-      <div className="App">
-        <Navbar />
-        <Login />
-      </div>
+      <Layout>
+        <LoginPage />
+      </Layout>
     ),
   },
   {
     path: "/createpost",
     element: (
-      <div className="App">
-        <Navbar />
-        <CreatePost />
-      </div>
+      <Layout>
+        <CreatePostPage />
+      </Layout>
     ),
   },
   {
     path: "/profile/:uid",
     element: (
-      <div className="App">
-        <Navbar />
-        <Profile />
-      </div>
+      <Layout>
+        <ProfilePage />
+      </Layout>
     ),
-  }
+  },
 ]);
 
-const App = () => {
+export default function App() {
   return (
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <ToastProvider>
+        <RouterProvider router={router} />
+      </ToastProvider>
+    </AuthProvider>
   );
 }
-
-export default App;
