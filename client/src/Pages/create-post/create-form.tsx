@@ -2,7 +2,7 @@ import {useForm} from 'react-hook-form';
 import * as yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader } from '../../components/Loader';
 import { AppError } from '../../types/errors';
@@ -147,7 +147,7 @@ export const CreateForm = () => {
 
   const onCreatePost = async (data: CreateFormData) => {
     setSubmitError(null);
-    if (authLoading || !user) {
+    if (authLoading || !user || !user.uid) {
       return;
     }
 
@@ -155,7 +155,7 @@ export const CreateForm = () => {
     try {
       const username = profile?.username || user.displayName || "User";
       const imageUrl = imagePreview || "";
-      await createPost(user.uid || "", username, data.title, data.description, imageUrl);
+      await createPost(user.uid, username, data.title, data.description, imageUrl);
       navigate('/');
       addToast("Post created");
     } catch (error: unknown) {

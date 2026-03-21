@@ -10,6 +10,6 @@ export const updateUserProfile = async (userId: string, data: { username?: strin
   return response.data;
 };
 
-export const uploadProfileImage = async (userId: string, file: File): Promise<string> => {
+export const uploadProfileImage = async (_userId: string, file: File): Promise<string> => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(file.name)}&background=random`;
 };

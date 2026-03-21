@@ -14,7 +14,7 @@ export const getUserPosts = async (userId: string) => {
   return response.data;
 };
 
-export const createPost = async (userId: string, username: string, title: string, description: string, imageUrl?: string) => {
+export const createPost = async (_userId: string, _username: string, title: string, description: string, imageUrl?: string) => {
   const response = await api.post('/posts', {
     title,
     description,

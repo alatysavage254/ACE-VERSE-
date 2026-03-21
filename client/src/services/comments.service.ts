@@ -5,7 +5,7 @@ export const getComments = async (postId: string) => {
   return response.data;
 };
 
-export const addComment = async (postId: string, userId: string, username: string, text: string) => {
+export const addComment = async (postId: string, _userId: string, _username: string, text: string) => {
   const response = await api.post('/comments', {
     postId,
     text

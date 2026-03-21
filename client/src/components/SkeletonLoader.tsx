@@ -1,5 +1,4 @@
 // filename: src/components/SkeletonLoader.tsx
-import React from 'react';
 import { motion } from 'framer-motion';
 
 export const PostSkeleton = () => (
