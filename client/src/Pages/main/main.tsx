@@ -7,8 +7,8 @@ import { motion } from "framer-motion";
 
 export const Main = () => {
   const { user, profileLoading } = useAuthContext();
-  const userId = user?._id || user?.uid;
-  const { posts, loading, loadingMore, hasMore, loadMore } = usePosts(userId, 10);
+  // Don't pass userId to show ALL posts, not just followed users
+  const { posts, loading, loadingMore, hasMore, loadMore } = usePosts(undefined, 10);
 
   const sentinelRef = useInfiniteScroll(loadMore, hasMore, loading || loadingMore || profileLoading);
 
