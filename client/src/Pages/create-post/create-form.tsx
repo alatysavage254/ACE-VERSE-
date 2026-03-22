@@ -154,9 +154,14 @@ export const CreateForm = () => {
       return;
     }
 
+    const userId = user._id || user.uid;
+    if (!userId) {
+      setSubmitError('User ID not found. Please log in again.');
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const userId = user._id || user.uid;
       const username = profile?.username || user.username || user.displayName || "User";
       const imageUrl = imagePreview || "";
       console.log('Creating post...', { userId, username, title: data.title, imageUrl: imageUrl ? 'has image' : 'no image' });
