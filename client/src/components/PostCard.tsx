@@ -23,6 +23,7 @@ export const PostCard = ({ post, priority = false }: { post: Post; priority?: bo
   const { comments, addNewComment, loading: commentSubmitting } = useComments(post._id || post.id);
 
   const canDelete = userId === post.userId || user?.isAdmin;
+  console.log('PostCard - canDelete check:', { userId, postUserId: post.userId, isAdmin: user?.isAdmin, canDelete });
   const displayCommentUsername = profile?.username || user?.username || "User";
 
   const images = post.imageUrl ? [post.imageUrl] : [];

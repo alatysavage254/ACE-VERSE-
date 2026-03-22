@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { login, register, loginWithGoogle } from "../services/auth.service";
 import { useToast } from "../components/Toast";
 import { useAuthContext } from "../context/AuthContext";
-import loginImage from "../assets/mandem.png";
+import loginImage from "../assets/wis.png";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -78,10 +78,10 @@ export const Login = () => {
               initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="relative hidden overflow-hidden bg-gradient-to-br from-neon-violet/20 via-neon-indigo/20 to-neon-cyan/20 p-12 backdrop-blur-xl md:block"
+              className="relative hidden overflow-hidden bg-gradient-to-br from-neon-violet/10 via-neon-indigo/10 to-neon-cyan/10 p-12 backdrop-blur-xl md:block"
             >
               {/* Animated gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-violet/30 via-transparent to-neon-cyan/30 opacity-50" />
+              <div className="absolute inset-0 bg-gradient-to-br from-neon-violet/10 via-transparent to-neon-cyan/10 opacity-30" />
               <motion.div
                 animate={{
                   backgroundPosition: ["0% 0%", "100% 100%"],
@@ -118,9 +118,9 @@ export const Login = () => {
 
                 <div className="space-y-4">
                   {[
-                    { icon: "⚡", text: "Lightning-fast posts" },
-                    { icon: "🌐", text: "Global community" },
-                    { icon: "🔮", text: "Futuristic experience" },
+                    { text: "Lightning-fast posts" },
+                    { text: "Global community" },
+                    { text: "Futuristic experience" },
                   ].map((feature, idx) => (
                     <motion.div
                       key={idx}
@@ -130,7 +130,9 @@ export const Login = () => {
                       className="flex items-center gap-3 text-slate-200"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
-                        <span className="text-lg">{feature.icon}</span>
+                        <svg className="h-5 w-5 text-neon-cyan" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
                       </div>
                       <span className="font-medium">{feature.text}</span>
                     </motion.div>
@@ -139,7 +141,7 @@ export const Login = () => {
               </div>
 
               {/* Background image overlay */}
-              <div className="absolute inset-0 opacity-5">
+              <div className="absolute inset-0 opacity-20">
                 <img src={loginImage} alt="Background" className="h-full w-full object-cover" />
               </div>
             </motion.div>
@@ -322,6 +324,26 @@ export const Login = () => {
             </motion.div>
           </div>
         </div>
+
+        {/* Credits */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="mt-8 text-center"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-neon-violet/30 bg-cyber-dark/60 px-6 py-3 backdrop-blur-xl">
+            <span className="text-sm text-slate-400">Cooked by</span>
+            <span className="bg-gradient-to-r from-neon-cyan via-neon-violet to-neon-pink bg-clip-text font-black text-transparent">
+              alaty
+            </span>
+            <span className="text-slate-500">&</span>
+            <span className="bg-gradient-to-r from-neon-pink via-neon-indigo to-neon-cyan bg-clip-text font-black text-transparent">
+              bug101
+            </span>
+            <span className="text-xs text-slate-500">(HIM)</span>
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   );

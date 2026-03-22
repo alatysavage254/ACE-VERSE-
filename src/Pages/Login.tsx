@@ -43,7 +43,7 @@ export const Login = () => {
     <div className="mx-auto flex min-h-[80vh] max-w-5xl items-center justify-between gap-8 px-4 py-8">
       <div className="hidden flex-1 items-center justify-center md:flex">
         <img 
-          src={require('../assets/mandem.png')} 
+          src={require('../assets/pexels.jpg')} 
           alt="Login" 
           className="h-auto max-w-full rounded-2xl shadow-2xl"
         />
