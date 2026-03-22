@@ -15,11 +15,14 @@ export const getUserPosts = async (userId: string) => {
 };
 
 export const createPost = async (_userId: string, _username: string, title: string, description: string, imageUrl?: string) => {
+  console.log('createPost service called', { title, description, imageUrl: imageUrl ? 'has image' : 'no image' });
+  console.log('Token in localStorage:', localStorage.getItem('token') ? 'exists' : 'missing');
   const response = await api.post('/posts', {
     title,
     description,
     imageUrl: imageUrl || ''
   });
+  console.log('createPost response:', response.data);
   return response.data;
 };
 
