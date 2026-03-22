@@ -6,7 +6,7 @@ import { PostSkeleton } from "../../components/SkeletonLoader";
 import { motion } from "framer-motion";
 
 export const Main = () => {
-  const { user, profileLoading } = useAuthContext();
+  const { profileLoading } = useAuthContext();
   // Don't pass userId to show ALL posts, not just followed users
   const { posts, loading, loadingMore, hasMore, loadMore } = usePosts(undefined, 10);
 
