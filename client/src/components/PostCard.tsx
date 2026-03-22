@@ -22,7 +22,7 @@ export const PostCard = ({ post, priority = false }: { post: Post; priority?: bo
   const { likes, isLiked, toggleLike, loading: likeLoading } = useLikes(post._id || post.id, userId);
   const { comments, addNewComment, loading: commentSubmitting } = useComments(post._id || post.id);
 
-  const canDelete = userId === post.userId;
+  const canDelete = userId === post.userId || user?.isAdmin;
   const displayCommentUsername = profile?.username || user?.username || "User";
 
   const images = post.imageUrl ? [post.imageUrl] : [];

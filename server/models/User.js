@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
   followersCount: {
     type: Number,
     default: 0

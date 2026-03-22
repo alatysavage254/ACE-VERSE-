@@ -33,6 +33,7 @@ router.post('/register', [
       username: user.username,
       bio: user.bio,
       photoURL: user.photoURL,
+      isAdmin: user.isAdmin || false,
       followersCount: user.followersCount,
       followingCount: user.followingCount,
       token: generateToken(user._id)
@@ -54,6 +55,7 @@ router.post('/login', async (req, res) => {
         username: user.username,
         bio: user.bio,
         photoURL: user.photoURL,
+        isAdmin: user.isAdmin || false,
         followersCount: user.followersCount,
         followingCount: user.followingCount,
         token: generateToken(user._id)
@@ -104,6 +106,7 @@ router.post('/google', async (req, res) => {
       username: user.username,
       bio: user.bio,
       photoURL: user.photoURL,
+      isAdmin: user.isAdmin || false,
       followersCount: user.followersCount,
       followingCount: user.followingCount,
       token: generateToken(user._id)
