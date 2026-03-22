@@ -6,6 +6,7 @@ export interface User {
   photoURL: string;
   followersCount: number;
   followingCount: number;
+  isAdmin?: boolean;
   uid?: string;
   displayName?: string;
 }
