@@ -148,7 +148,7 @@ export const CreateForm = () => {
   const onCreatePost = async (data: CreateFormData) => {
     console.log('onCreatePost called', { data, user, authLoading });
     setSubmitError(null);
-    if (authLoading || !user || !user.uid) {
+    if (authLoading || !user) {
       console.log('Blocked: authLoading or no user', { authLoading, user });
       setSubmitError('Please log in to create a post');
       return;
@@ -156,10 +156,11 @@ export const CreateForm = () => {
 
     setSubmitting(true);
     try {
-      const username = profile?.username || user.displayName || "User";
+      const userId = user._id || user.uid;
+      const username = profile?.username || user.username || user.displayName || "User";
       const imageUrl = imagePreview || "";
-      console.log('Creating post...', { username, title: data.title, imageUrl: imageUrl ? 'has image' : 'no image' });
-      const result = await createPost(user.uid, username, data.title, data.description, imageUrl);
+      console.log('Creating post...', { userId, username, title: data.title, imageUrl: imageUrl ? 'has image' : 'no image' });
+      const result = await createPost(userId, username, data.title, data.description, imageUrl);
       console.log('Post created successfully', result);
       navigate('/');
       addToast("Post created");
