@@ -22,6 +22,18 @@ export interface Post {
   likesCount: number;
   commentsCount: number;
   createdAt: Date | string;
+  hashtags?: string[];
+  mentions?: string[];
+  isRepost?: boolean;
+  originalPostId?: string | {
+    _id: string;
+    userId: string;
+    username: string;
+    title: string;
+    description: string;
+    imageUrl?: string;
+  };
+  repostCount?: number;
 }
 
 export interface Like {
