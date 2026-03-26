@@ -3,14 +3,25 @@ import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import { usePosts } from "../../hooks/usePosts";
 import { PostCard } from "../../components/PostCard";
 import { PostSkeleton } from "../../components/SkeletonLoader";
+import { StoryRing } from "../../components/StoryRing";
+import { StoryViewer } from "../../components/StoryViewer";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { StoryGroup } from "../../services/stories.service";
 
 export const Main = () => {
   const { profileLoading } = useAuthContext();
   // Don't pass userId to show ALL posts, not just followed users
   const { posts, loading, loadingMore, hasMore, loadMore } = usePosts(undefined, 10);
+  const [showStoryViewer, setShowStoryViewer] = useState(false);
+  const [currentStoryGroup, setCurrentStoryGroup] = useState<StoryGroup | null>(null);
 
   const sentinelRef = useInfiniteScroll(loadMore, hasMore, loading || loadingMore || profileLoading);
+
+  const handleStoryClick = (group: StoryGroup) => {
+    setCurrentStoryGroup(group);
+    setShowStoryViewer(true);
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -21,6 +32,11 @@ export const Main = () => {
       </div>
 
       <div className="mx-auto w-full max-w-4xl px-4 py-8">
+        {/* Stories Section */}
+        <div className="mb-6 relative">
+          <StoryRing onStoryClick={handleStoryClick} />
+        </div>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -124,6 +140,16 @@ export const Main = () => {
         {/* Sentinel for infinite scroll */}
         <div ref={sentinelRef} className="h-10" />
       </div>
+
+      {/* Story Viewer Modal */}
+      {showStoryViewer && currentStoryGroup && (
+        <StoryViewer
+          stories={currentStoryGroup.stories}
+          initialIndex={0}
+          onClose={() => setShowStoryViewer(false)}
+          username={currentStoryGroup.username}
+        />
+      )}
     </div>
   );
 };

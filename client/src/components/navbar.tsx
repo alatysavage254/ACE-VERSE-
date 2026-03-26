@@ -4,6 +4,8 @@ import { logout } from "../services/auth.service";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { UserSearch } from "./UserSearch";
+import { NotificationBell } from "./NotificationBell";
 
 export const Navbar = () => {
   const { user, profile, setUser, setProfile } = useAuthContext();
@@ -50,6 +52,10 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
+          <div className="hidden items-center gap-2 md:flex flex-1 justify-center px-8">
+            <UserSearch />
+          </div>
+
           <div className="hidden items-center gap-2 md:flex">
             <NavLink to="/" active={isActive("/")}>
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,17 +72,27 @@ export const Navbar = () => {
                 Login
               </NavLink>
             ) : (
-              <NavLink to="/createpost" active={isActive("/createpost")}>
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Create
-              </NavLink>
+              <>
+                <NavLink to="/messages" active={isActive("/messages")}>
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  Messages
+                </NavLink>
+                <NavLink to="/createpost" active={isActive("/createpost")}>
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Create
+                </NavLink>
+              </>
             )}
           </div>
 
           {/* User Menu & Actions */}
           <div className="flex items-center gap-3">
+            {user && <NotificationBell />}
+            
             {user && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link

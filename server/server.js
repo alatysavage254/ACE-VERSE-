@@ -8,6 +8,9 @@ import postRoutes from './routes/posts.js';
 import likeRoutes from './routes/likes.js';
 import commentRoutes from './routes/comments.js';
 import followRoutes from './routes/follows.js';
+import storyRoutes from './routes/stories.js';
+import messageRoutes from './routes/messages.js';
+import notificationRoutes from './routes/notifications.js';
 
 dotenv.config();
 
@@ -25,6 +28,9 @@ app.use('/api/posts', postRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/follows', followRoutes);
+app.use('/api/stories', storyRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Savage API is running' });

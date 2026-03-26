@@ -2,6 +2,7 @@ import express from 'express';
 import Like from '../models/Like.js';
 import Post from '../models/Post.js';
 import { protect } from '../middleware/auth.js';
+import { createNotification } from './notifications.js';
 
 const router = express.Router();
 
@@ -33,6 +34,18 @@ router.post('/', protect, async (req, res) => {
     });
 
     await Post.findByIdAndUpdate(postId, { $inc: { likesCount: 1 } });
+
+    // Create notification for post owner
+    const post = await Post.findById(postId);
+    if (post) {
+      await createNotification(
+        post.userId,
+        'like',
+        req.user._id,
+        `@${req.user.username} liked your post`,
+        postId
+      );
+    }
 
     res.status(201).json(like);
   } catch (error) {

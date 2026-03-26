@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import * as yup from "yup";
@@ -17,6 +17,7 @@ type ProfileForm = { username: string; bio: string; imageFile?: FileList };
 
 export const Profile = () => {
   const { uid } = useParams();
+  const navigate = useNavigate();
   const { user: currentUser, profile: currentProfile, profileLoading, setProfile } = useAuthContext();
   const { addToast } = useToast();
   const [editMode, setEditMode] = useState(false);
@@ -178,19 +179,29 @@ export const Profile = () => {
             {/* Action Buttons */}
             <div className="flex gap-3">
               {!isOwner ? (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={toggleFollow}
-                  disabled={followLoading}
-                  className={`rounded-xl px-6 py-3 text-sm font-bold backdrop-blur-sm transition-all disabled:opacity-40 ${
-                    following
-                      ? "bg-white/10 text-slate-300 hover:bg-white/20"
-                      : "bg-gradient-to-r from-neon-indigo to-neon-cyan text-white shadow-glow-md shadow-neon-indigo/50 hover:shadow-glow-lg"
-                  }`}
-                >
-                  {following ? "Unfollow" : "Follow"}
-                </motion.button>
+                <>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={toggleFollow}
+                    disabled={followLoading}
+                    className={`rounded-xl px-6 py-3 text-sm font-bold backdrop-blur-sm transition-all disabled:opacity-40 ${
+                      following
+                        ? "bg-white/10 text-slate-300 hover:bg-white/20"
+                        : "bg-gradient-to-r from-neon-indigo to-neon-cyan text-white shadow-glow-md shadow-neon-indigo/50 hover:shadow-glow-lg"
+                    }`}
+                  >
+                    {following ? "Unfollow" : "Follow"}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate('/messages', { state: { startConversationWith: targetUser } })}
+                    className="rounded-xl bg-white/10 px-6 py-3 text-sm font-bold text-slate-300 backdrop-blur-sm transition-all hover:bg-white/20"
+                  >
+                    Message
+                  </motion.button>
+                </>
               ) : (
                 <motion.button
                   whileHover={{ scale: 1.05 }}

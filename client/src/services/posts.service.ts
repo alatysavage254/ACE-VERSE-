@@ -30,3 +30,28 @@ export const deletePostWithRelations = async (postId: string) => {
   const response = await api.delete(`/posts/${postId}`);
   return response.data;
 };
+
+export const searchPostsByHashtag = async (tag: string, limit = 20, cursor?: string) => {
+  const params: any = { limit };
+  if (cursor) params.cursor = cursor;
+  
+  const response = await api.get(`/posts/hashtag/${tag}`, { params });
+  return response.data;
+};
+
+export const searchUsers = async (query: string, limit = 10) => {
+  const response = await api.get('/posts/search/users', {
+    params: { q: query, limit }
+  });
+  return response.data;
+};
+
+export const repostPost = async (postId: string) => {
+  const response = await api.post(`/posts/${postId}/repost`);
+  return response.data;
+};
+
+export const deleteRepost = async (postId: string) => {
+  const response = await api.delete(`/posts/${postId}/repost`);
+  return response.data;
+};

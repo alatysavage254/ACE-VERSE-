@@ -17,6 +17,9 @@ const CreatePostPage = React.lazy(() =>
 const ProfilePage = React.lazy(() =>
   import("./Pages/profile/Profile").then((m) => ({ default: m.Profile }))
 );
+const MessagesPage = React.lazy(() =>
+  import("./Pages/Messages").then((m) => ({ default: m.Messages }))
+);
 
 const CyberLoader = () => (
   <div className="flex min-h-screen items-center justify-center animated-bg">
@@ -102,6 +105,14 @@ const router = createBrowserRouter([
     element: (
       <Layout>
         <CreatePostPage />
+      </Layout>
+    ),
+  },
+  {
+    path: "/messages",
+    element: (
+      <Layout>
+        <MessagesPage />
       </Layout>
     ),
   },

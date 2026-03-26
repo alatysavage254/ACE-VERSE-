@@ -36,6 +36,15 @@
   .cyber-card-hover {
     @apply hover:scale-[1.02] hover:shadow-glow-md hover:border-neon-violet/50;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Animated gradient background */

@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import type { Post } from "../types";
 import { useComments } from "../hooks/useComments";
 import { useLikes } from "../hooks/useLikes";
 import { useToast } from "./Toast";
-import { deletePostWithRelations } from "../services/posts.service";
+import { deletePostWithRelations, repostPost, deleteRepost } from "../services/posts.service";
 
 export const PostCard = ({ post, priority = false }: { post: Post; priority?: boolean }) => {
   const { user, profile } = useAuthContext();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const [commentText, setCommentText] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [reposting, setReposting] = useState(false);
+  const [isReposted, setIsReposted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -84,6 +88,59 @@ export const PostCard = ({ post, priority = false }: { post: Post; priority?: bo
     } finally {
       setDeleting(false);
     }
+  };
+
+  const handleRepost = async () => {
+    if (!user || reposting) return;
+    
+    setReposting(true);
+    try {
+      if (isReposted) {
+        await deleteRepost(post._id || post.id);
+        setIsReposted(false);
+        addToast("Repost removed");
+      } else {
+        await repostPost(post._id || post.id);
+        setIsReposted(true);
+        addToast("Reposted!");
+      }
+    } catch (e: any) {
+      console.error(e);
+      addToast(e.response?.data?.message || "Failed to repost");
+    } finally {
+      setReposting(false);
+    }
+  };
+
+  const renderTextWithLinks = (text: string) => {
+    const parts = text.split(/(\s+)/);
+    return parts.map((part, i) => {
+      if (part.startsWith('#')) {
+        return (
+          <span
+            key={i}
+            onClick={() => navigate(`/hashtag/${part.slice(1)}`)}
+            className="text-neon-cyan cursor-pointer hover:underline"
+          >
+            {part}
+          </span>
+        );
+      } else if (part.startsWith('@')) {
+        return (
+          <span
+            key={i}
+            onClick={() => {
+              // Navigate to user profile - would need to look up user by username
+              addToast("User profile navigation coming soon");
+            }}
+            className="text-neon-violet cursor-pointer hover:underline"
+          >
+            {part}
+          </span>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
   };
 
   const submitComment = async (e: React.FormEvent) => {
@@ -254,21 +311,51 @@ export const PostCard = ({ post, priority = false }: { post: Post; priority?: bo
                   />
                 </svg>
               </button>
+
+              {/* Repost button */}
+              <button
+                onClick={handleRepost}
+                disabled={!user || reposting}
+                className={`flex items-center gap-2 text-sm font-semibold transition-all disabled:opacity-40 ${
+                  isReposted ? "text-neon-cyan" : "text-slate-300 hover:text-slate-100"
+                }`}
+              >
+                <motion.svg
+                  animate={isReposted ? { rotate: [0, 360] } : {}}
+                  transition={{ duration: 0.5 }}
+                  className="h-7 w-7"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </motion.svg>
+              </button>
             </div>
 
             {/* Like count */}
-            <div className="mt-2">
+            <div className="mt-2 flex items-center gap-4">
               <span className="text-sm font-semibold text-slate-100">
                 {likes?.length ?? 0} {likes?.length === 1 ? 'like' : 'likes'}
               </span>
+              {post.repostCount && post.repostCount > 0 && (
+                <span className="text-sm font-semibold text-slate-100">
+                  {post.repostCount} {post.repostCount === 1 ? 'repost' : 'reposts'}
+                </span>
+              )}
             </div>
 
             {/* Post caption */}
             <div className="mt-2">
               <span className="text-sm font-semibold text-slate-100">@{post.username}</span>
-              <span className="ml-2 text-sm text-slate-300">{post.title}</span>
+              <span className="ml-2 text-sm text-slate-300">{renderTextWithLinks(post.title)}</span>
               {post.description && (
-                <p className="mt-1 text-sm text-slate-300">{post.description}</p>
+                <p className="mt-1 text-sm text-slate-300">{renderTextWithLinks(post.description)}</p>
               )}
             </div>
 

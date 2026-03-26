@@ -2,6 +2,7 @@ import express from 'express';
 import Follow from '../models/Follow.js';
 import User from '../models/User.js';
 import { protect } from '../middleware/auth.js';
+import { createNotification } from './notifications.js';
 
 const router = express.Router();
 
@@ -42,6 +43,14 @@ router.post('/', protect, async (req, res) => {
 
     await User.findByIdAndUpdate(req.user._id, { $inc: { followingCount: 1 } });
     await User.findByIdAndUpdate(followingId, { $inc: { followersCount: 1 } });
+
+    // Create notification for followed user
+    await createNotification(
+      followingId,
+      'follow',
+      req.user._id,
+      `@${req.user.username} started following you`
+    );
 
     res.status(201).json(follow);
   } catch (error) {
